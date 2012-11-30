@@ -8,11 +8,15 @@ Click branches marked by green rectangles to control the track of trains.
 Getting Started
 ------------
 Click [here](http://cnnzp.github.com/left-or-right) to play.
+Or clone https://github.com/cnnzp/game-off-2012.git and open index.html to play.
+Make sure your browser support html5 canvas. 
 
 Screenshot
 ------------
+Oh!Collision
 ![Oh!Collision](http://github.com/cnnzp/game-off-2012/raw/master/screenshot/1.png)
 
+Yeah!Here we are!
 ![Yeah!Here we are!](http://github.com/cnnzp/game-off-2012/raw/master/screenshot/2.png)
 
 Used open source projects:
