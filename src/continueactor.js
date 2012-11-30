@@ -50,18 +50,25 @@ var drawStarModel = function(m, painter)
 
 require('painter').HonestPainter.register('star', {bbox:function(){return new geo.Rect(0, 0, 0, 0);}, draw:drawStarModel, inside:function(){return false;}});
 
-var continueActorCtor = function(level, star, continuation)
+var continueActorCtor = function(level, star, totalStar, continuation, again)
 {
-  var baseModel = m.ConvexModel.create({vertexes:[{x:0, y:0}, {x:150, y:0}, {x:150, y:65}, {x:0, y:65}], stroke:"rgb(0, 0, 0)"});
+  var baseModel = m.ConvexModel.create({vertexes:[{x:0, y:0}, {x:150, y:0}, {x:150, y:90}, {x:0, y:90}], stroke:"rgb(0, 0, 0)"});
   
   var sm = []
-  ,   starModel = m.rotateModel(StarModel.create({r:10, fill:"red"}), -Math.PI/9.6);
+  ,   starModel = m.rotateModel(StarModel.create({r:12, fill:"red"}), -Math.PI/9.6)
+  ,   grayStarModel = m.rotateModel(StarModel.create({r:12, fill:"slategray"}), -Math.PI/9.6)
 
-  for (var i = 0; i<star; i++)
+  console.log("star:"+star+"totalStar:"+totalStar);
+  for (var i = 0; i<totalStar; i++)
   {
-    sm.push(m.translateModel(starModel, i*20, 0));
+    if (i < star)
+      sm.push(m.translateModel(starModel, i*20, 0));
+    else
+      sm.push(m.translateModel(grayStarModel, i*20, 0));
   }
-  sm = m.overlap.apply(undefined, sm);
+
+  sm =  m.overlap.apply(undefined, sm);
+  sm = m.moveRelative(-0.5, -0.5, m.translateModel(sm, 110, -6));
 
   var cmbg = m.ConvexModel.create({vertexes:[{x:0, y:0}, {x:60, y:0}, {x:60, y:30}, {x:0, y:30}], stroke:"rgb(0, 0, 0)"});
   var cmcontent = m.TextModel.create({text:"next", fill:"rgb(0, 0, 0)"});
@@ -69,30 +76,40 @@ var continueActorCtor = function(level, star, continuation)
   var cmbgbbox = require("director").director().exec("defaultPainter").exec("bbox", cmbg);
   var mc = m.overlap(cmbg, m.translateModel(m.moveRelative(-0.5, -0.7, cmcontent), cmbgbbox.size.width/2, cmbgbbox.size.height/2));
 
-  var model = m.overlap(baseModel, m.translateModel(m.overlap(sm, m.tagModel(m.translateModel(mc, 60, -15), "next")), 20, 30));
+  var agmbg = m.ConvexModel.create({vertexes:[{x:0, y:0}, {x:60, y:0}, {x:60, y:30}, {x:0, y:30}], stroke:"rgb(0, 0, 0)"});
+  var agmcontent = m.TextModel.create({text:"replay", fill:"rgb(0, 0, 0)"});
+  var agmbgbbox = require("director").director().exec("defaultPainter").exec("bbox", agmbg);
+  var agm = m.overlap(agmbg, m.translateModel(m.moveRelative(-0.5, -0.7, agmcontent), agmbgbbox.size.width/2, agmbgbbox.size.height/2));
+
+  var model = m.overlap(baseModel, m.translateModel(m.overlap(sm, m.tagModel(m.translateModel(agm, -10, 15), "again"), m.tagModel(m.translateModel(mc, 60, 15), "next")), 20, 30));
+
   model = m.moveRelative(-0.5, -0.5, model);
 
   var mouseClickedCB = function(evt, a)
   {
-    if (evt.modelPath == "next")
+    var painter = require("director").director().exec("defaultPainter");
+    var canvas = painter.exec("sketchpad").canvas;
+
+    switch(evt.type)
     {
-      var painter = require("director").director().exec("defaultPainter");
-      var canvas = painter.exec("sketchpad").canvas;
-
-      switch(evt.type)
-      {
-      case "mouseClicked":
+    case "mouseClicked":
+      if (evt.modelPath == "next"){
         continuation();
-        break;
-      case "mouseOver":
-        canvas.style.cursor = "hand";
-        break;
-      case "mouseOut":
-        canvas.style.cursor = "default";
-        break;
       }
+      else if (evt.modelPath == "again")
+      {
+        again();
+      }
+      break;
+    case "mouseOver":
+      if (evt.modelPath == "next" || evt.modelPath == "again")
+        canvas.style.cursor = "hand";
+      break;
+    case "mouseOut":
+      if (evt.modelPath == "next" || evt.modelPath == "again")
+        canvas.style.cursor = "default";
+      break;
     }
-
   };
 
   var a = Actor.create({model:model, level:level});

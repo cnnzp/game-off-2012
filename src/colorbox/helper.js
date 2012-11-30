@@ -13,15 +13,14 @@ function createSketchpad(width, height, parent)
   }
 
   var cv = document.createElement("canvas");
-  
   if (parent === undefined)
   {
-    //document.body.insertBefore(cv, document.body.childNodes[0]);
+//    document.body.insertBefore(cv, document.body.childNodes[0]);
     document.body.appendChild(cv);
   }
   else
   {
-    //parent.insertBefore(cv, document.body.childNodes[0])
+    // parent.insertBefore(cv, document.body.childNodes[0])
     parent.appendChild(cv);
   }
   
