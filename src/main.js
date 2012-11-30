@@ -174,7 +174,7 @@ function main()
   gdirector.exec("update", gclock);
 
   // 以50帧每秒(即每隔20毫秒)的帧率来驱动loop函数
-  setInterval(loop, 10);
+  setInterval(loop, 30);
 }
 
 exports.main = main;

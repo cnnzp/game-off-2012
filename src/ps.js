@@ -848,7 +848,7 @@ var paintPaths = function(painter, pstns, strokeStyle)
   {
     ctx.arc(pstns[i].x, pstns[i].y, 3, Math.PI*2, 0);
   }
-  ctx.fill();
+  ctx.stroke();
 
   ctx.closePath();
   
