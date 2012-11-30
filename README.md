@@ -9,9 +9,10 @@ Getting Started
 ------------
 Click [here](http://cnnzp.github.com/left-or-right) to play.
 Or clone https://github.com/cnnzp/game-off-2012.git and open index.html to play.
-Make sure your browser support html5 canvas. 
 
-We recommend high version chrome and safari. IE is not supported.
+Make sure your browser support html5 canvas. 
+We recommend high version chrome, safari and opera. Firefox 16.0 is ok, but version 17.0 has some font problems.
+IE is not supported.
 
 Screenshot
 ------------
