@@ -13,7 +13,7 @@ var createOpenActor = function()
   canvas.height = 480;
 
   var nt = new NaughtyText(400, 3, 4, canvas, 1.8, 3000, 1000);
-  nt.drawTextTemplate("Left or Right?", 10, 100);
+  nt.drawTextTemplate("Left or Right ?", 10, 100);
   
   
    var model = m.ProcedureModel.create({
