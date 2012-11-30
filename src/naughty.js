@@ -1,8 +1,7 @@
 
 __resources__["/naughty.js"] = {meta: {mimetype: "application/javascript"}, data: function(exports, require, module, __filename, __dirname) {
 
-
-function Circle(x, y, r) {
+function Circle(x, y, r, color) {
   this.x = x;
   this.y = y;
   this.r = r;
@@ -34,6 +33,42 @@ function NaughtyText(count, radius, blockSide,
   var w = backCanvas.width;
   var h = backCanvas.height;
 
+  // var c0 = {
+  //   // steelblue
+  //   r:70,
+  //   g:130,
+  //   b:180
+  // };
+
+  var c0 = {
+    // steelblue
+    r:70,
+    g:130,
+    b:180
+  };
+    
+  var c1 = {
+    // orangered
+    r:255,
+    g:69,
+    b:0
+  };
+
+  var colors = [c0, c1];
+  c0.vr = (c1.r - c0.r) / gatherDuration;
+  c0.vg = (c1.g - c0.g) / gatherDuration;
+  c0.vb = (c1.b - c0.b) / gatherDuration;
+  c1.vr = (c0.r - c1.r) / scatterDuration;
+  c1.vg = (c0.g - c1.g) / scatterDuration;
+  c1.vb = (c0.b - c1.b) / scatterDuration;
+  
+  this.colors = colors;
+  this.color = {
+    r: c0.r,
+    g: c0.g,
+    b: c0.b
+  };
+
   var elementArray = new Array(count);
   for (var i = 0; i < count; ++i) 
   {
@@ -42,7 +77,8 @@ function NaughtyText(count, radius, blockSide,
                  Math.floor(Math.random() * h), 
                  radius);
   }
-  this.elementArray = elementArray;  
+  
+  this.elementArray = elementArray;
 
 
   this.elapse =  0;
@@ -153,46 +189,105 @@ NaughtyText.prototype.gather = function ()
 
 NaughtyText.prototype.scatter = function () 
 {
-  var windForce = 5;
-  this.windX = Math.sin(Math.random() * Math.PI * 2) * windForce;
-  this.windY = Math.cos(Math.random() * Math.PI * 2) * windForce;
+  var windForce = 0;
+  this.windX = 0;//Math.sin(Math.random() * Math.PI * 2) * windForce;
+  this.windY = 0;//Math.cos(Math.random() * Math.PI * 2) * windForce;
   var ea = this.elementArray;
   for (var i = 0; i < ea.length; ++i)
   {
     var angle = Math.random() * Math.PI * 2;
-    ea[i].vx = (0 + Math.sin(angle)) * this.fadeFactor;
+    var dir = Math.sin(angle);
+    var minv = 2.5;
+    if(dir < 0)
+    {
+      dir += -minv;
+    }
+    else
+    {
+      dir += minv;
+    }
+    ea[i].vx = dir * this.fadeFactor;
     ea[i].vy = (0 + Math.cos(angle)) * this.fadeFactor;
     ea[i].destX = -10;
     ea[i].destY = -10;
   }
 }
 
-NaughtyText.prototype._doUpdate = function () 
+NaughtyText.prototype._doUpdate = function (dt) 
 {
   var ea = this.elementArray;
+  var colors = this.colors;
+  
+  if(this.current === this._gatherState)
+  {
+    var leftTime = (0.5 * this.gatherDuration - this.elapse);
+    var factor = 0;
+    if(leftTime <= 0)
+    {
+      factor = 1;
+    }
+    else
+    {
+      factor = dt / leftTime;
+    }
+ 
+    this.color.r += (colors[1].r - this.color.r) * factor;
+    this.color.g += (colors[1].g - this.color.g) * factor;
+    this.color.b += (colors[1].b - this.color.b) * factor;
+
+  }
+  else if(this.current === this._scatterState)
+  {
+    var leftTime = (this.gatherDuration + this.scatterDuration - this.elapse);
+    var factor = 0;
+    if(leftTime <= 0)
+    {
+      factor = 1;
+    }
+    else
+    {
+      factor = dt / leftTime;
+    }
+
+    this.color.r += (colors[0].r - this.color.r) * factor;
+    this.color.g += (colors[0].g - this.color.g) * factor;
+    this.color.b += (colors[0].b - this.color.b) * factor;
+  }
+
+  var tf = dt / 30;
+  var fade = Math.pow(0.95, tf);
+  var damping = Math.pow(0.99, tf);
+  
   for (var i = 0; i < ea.length; ++i) 
   {
     var e = ea[i];
 
     if (e.destX >= 0) 
     {
-      e.x += (e.destX - e.x) / 4 + ((e.destX - e.x) / 90 * e.vx) + this.windX;
-      e.y += (e.destY - e.y) / 4 + ((e.destY - e.y) / 90 * e.vy) + this.windY;
-      e.alpha += (1.0 - e.alpha) / 2;
+      var dx = e.destX - e.x;
+      var dy = e.destY - e.y;
+      var d = Math.sqrt(dx * dx + dy * dy);
+
+      e.x += (dx / 4 + (dx / 120 * e.vx) + this.windX) * tf;
+      e.y += (dy / 6 + (dy / 120 * e.vy) + this.windY) * tf;
+      e.alpha += ((1.0 - e.alpha) / 2) * tf ;
+      if (e.alpha > 1)
+      {
+        e.alpha = 1;
+      }
     } 
     else 
     {
-      e.x += e.vx + this.windX;
-      e.y += e.vy + this.windY;
-      e.vy += 1.0; // gravity
-      e.alpha *= 0.95  //fade : (.5 + e.alpha) * 0.78//.98
+      e.x += (e.vx + this.windX) * tf;
+      e.y += (e.vy + this.windY) * tf;
+      e.vy += 0.5 * tf; // gravity
+      e.alpha *= fade;
       if (e.alpha < 0) 
       {
         e.alpha = 0;
       }
     }
 
-    var damping = 0.9999;
     this.windX *= damping;
     this.windY *= damping;
 
@@ -228,12 +323,17 @@ NaughtyText.prototype._doUpdate = function ()
 NaughtyText.prototype.update = function (dt)
 {
   this.current();
-  this._doUpdate();
+  this._doUpdate(dt);
   this.elapse += dt;
 }
 
 NaughtyText.prototype.draw = function (ctx) 
 {
+  var c = 'rgb(' + Math.floor(this.color.r) + ',' + 
+    Math.floor(this.color.g) +
+    ',' + Math.floor(this.color.b) + ')';
+
+  ctx.fillStyle = c;
   
   var ea = this.elementArray;
   for (var i = 0; i < ea.length; ++i) 
@@ -241,36 +341,12 @@ NaughtyText.prototype.draw = function (ctx)
     var e = ea[i];
     ctx.globalAlpha = e.alpha;
     ctx.beginPath();
-    ctx.fillStyle = "#7f007f";
+    //ctx.fillStyle = "#7f007f";
     ctx.arc(e.x, e.y, e.r, 0, Math.PI * 2, true);
     //ctx.closePath();
     ctx.fill();
   }
 }
-
-function init() {
-  var ctx = document.getElementById('born_canvas').getContext("2d");
-  var WIDTH = document.getElementById("born_canvas").width;
-  var HEIGHT = document.getElementById("born_canvas").height;
-  var texture = document.getElementById('born_canvas_hidden');
-
-  var nt = new NaughtyText(400, 3, 4, texture, 2, 3000, 1000);
-  nt.drawTextTemplate("Left or Right?", 20, 100);
-  
-  var dt = 33;
-
-
-  var loop = function ()
-  {
-    nt.update(dt);
-    
-    ctx.clearRect(0,0,WIDTH, HEIGHT);
-    nt.draw(ctx);
-  }
-  
-  return setInterval(loop, dt)
-}
-
 
 exports.NaughtyText = NaughtyText;
 

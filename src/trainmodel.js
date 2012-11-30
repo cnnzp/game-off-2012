@@ -87,8 +87,8 @@ var TrainModel = Model.extend(
        
       for (var i = 0; i<this.slot("_circles"); i++)
       {
-         var port = pipe.createPort(pipe.delayP(param.pipe, (i)*4, param.clocker));
-         var matrix = geo.identityMatrix();
+         var port = pipe.createPort(pipe.delayP(param.pipe, (i)*30*2, param.clocker));
+        var matrix = new geo.Matrix(1, 0, 0, 1, -1000, -1000);
          ports.push(port);
         models.push(m.moveRelative(-0.5, -0.5, m.CircleModel.create({radius:5, stroke:param.color})));
          //matrixes.push(matrix);

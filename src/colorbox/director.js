@@ -46,6 +46,11 @@ var timeStamperTrait = Trait.extend({
       this.slot("_curTime", this.slot("_curTime") + this.slot("_step"));
   },
   
+  adjust:function(t)
+  {
+    this.slot("_curTime", t);
+  },
+
   now:function()
   {
     return this.slot("_curTime");
@@ -174,6 +179,7 @@ var directorTrait = Trait.extend({
     this.execProto("initialize");
     
     this.slot("_timeStamper", TimeStamper.create());
+    this.slot("_globalTimeStamper", TimeStamper.create());
     this.slot("_sysPipe", pipe.createEventTrigger(this.slot("_timeStamper")));
     
     debug.assert(param.painter, 'param error');
@@ -203,6 +209,11 @@ var directorTrait = Trait.extend({
     };
     
     globalClocker(clockf);
+  },
+
+  globalTimeStamper:function()
+  {
+    return this.slot("_globalTimeStamper");
   },
 
   getGameWorldToViewMatrix:function()
@@ -239,8 +250,13 @@ var directorTrait = Trait.extend({
   
   update:function(t, dt)
   {
-    this.slot("_timeStamper").exec("stepForward", dt);
-    this.slot("_now", this.slot("_now") + 1);
+    //this.slot("_timeStamper").exec("stepForward", dt);
+    this.slot("_timeStamper").exec("adjust", t);
+    this.slot("_globalTimeStamper").exec("adjust", t);
+
+    //fixme:sound may be need adjust, global clocker will get real time
+    //this.slot("_now", this.slot("_now") + 1);
+    this.slot("_now",  t);
 
     //allways check mouseover, mouseout.
     if (!this.slot("_defaultPainter").exec("eventDecider").isMousePressed())

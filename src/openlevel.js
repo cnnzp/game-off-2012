@@ -71,7 +71,7 @@ var OpenLevel = Level.extend(
                                         {x:0, y:-3},
                                         {x:0, y:3}
                                       ],
-                                      strokeStyle:"rgb(127, 0, 127)"
+                                      strokeStyle:"orangered"
                                      });
 
       var model = m.scaleModel(m.overlap(bg, arrow), 1.5, 1.5);

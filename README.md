@@ -1,13 +1,13 @@
 Left or right? That is the question!
 ============
 
-In busy season, the correct scheduling of trains is not easy, you must prevent them from collision¡£
+In busy season, the correct scheduling of trains is not easy, you must prevent them from collision.
 Each train has its own destination which marked by the solid circle with same color.
 Click branches marked by green rectangles to control the track of trains.
 
 Getting Started
 ------------
-Click [here](http://github.com/cnnzp/game-off-2012/blob/master/src/index.html) to play.
+Click [here](http://cnnzp.github.com/left-or-right) to play.
 
 Screenshot
 ------------

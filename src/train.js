@@ -35,12 +35,14 @@ var Train = Actor.extend(
 
        var self = this;
 
+      var clocker = require("director").director().exec("globalTimeStamper");
       debug.assert(param.level != undefined  && param.id != undefined, "parameter error");
        this.slot("_level", param.level);
        
       var timeStamp = TimeStamper.create();
       var p = pipe.createEventTrigger(timeStamp);
       this.slot("_pipe", p);
+      //this.slot("clocker", timeStamp);
       this.slot("clocker", timeStamp);
 
       this.slot("_id", param.id);
@@ -62,9 +64,9 @@ var Train = Actor.extend(
       this.slot("_curPS", undefined);
 
       this.exec("regUpdate", 
-                function()
+                function(t)
                 {
-                  timeStamp.exec("stepForward");
+                  timeStamp.exec("adjust", t);
                   if (self.exec("state") == "traversing")
                   {
                     pipe.triggerEvent(p, {type:"curMatrix", matrix:self.exec("matrix"), ps:self.exec("curPS")});
@@ -74,7 +76,7 @@ var Train = Actor.extend(
 
     triggerEvent:function()
     {
-      this.slot("clocker").exec("stepForward", 100);
+      //this.slot("clocker").exec("stepForward", 100);
       
       pipe.triggerEvent(this.slot("_pipe"), {type:"curMatrix", matrix:this.exec("matrix"), ps:this.exec("curPS")});
     },
