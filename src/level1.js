@@ -105,10 +105,32 @@ var genOnNext = function(level)
   };
 };
 
+var genAgain = function(level)
+{
+  return function()
+  {
+    var ca = level.slot("_ca");
+
+    var showingSani = ani.scaleToByTime([0, {x:1, y:1}, 'sine'], [1500, {x:0, y:0}, 'linear']);
+    var showingRani = ani.rotateToByTime([0, Math.PI*4, 'sine'], [1500, 0, 'linear']);
+    ca.exec("addAnimation", showingSani);
+    ca.exec("addAnimation", showingRani);
+    
+    showingSani.exec("regCBByPercent", 
+                     1,
+                     function()
+                     {
+                       level.exec("scene").exec("removeActor", ca);
+                       require("main").runCurLevelAgain();
+                     });
+  };
+};
+
 var createAllTrain = function(level, ps)
 {
   //paths is object not array
   var paths = getTrainPaths(ps);
+  
   
   return paths.reduce(function(trains, path)
                       {
@@ -124,7 +146,7 @@ var createAllTrain = function(level, ps)
 
                         return trains;
                       },
-                      new Array(Object.keys(paths).length)
+                      []
                      );
 };
 
@@ -245,7 +267,8 @@ var Level1 = Level.extend(
 
       if (this.exec("isGameOver") && undefined == this.slot("_ca"))
       {
-        var ca = continueActorCtor(this, getLevelStar(this), genOnNext(this));
+        //trains 的id从1开始，所以数组的长度要减去1
+        var ca = continueActorCtor(this, getLevelStar(this), this.slot("_trains").length-1, genOnNext(this), genAgain(this));
         this.exec("scene").exec("addActor", ca);
         ca.exec("translate", 200, 200, 100);
         ca.exec("scale", 0, 0);

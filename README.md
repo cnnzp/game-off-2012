@@ -7,7 +7,7 @@ Click branches marked by green rectangles to control the track of trains.
 
 Getting Started
 ------------
-Click [here](http://github.com/cnnzp/game-off-2012/blob/master/src/index.html) to play.
+Click [here](http://cnnzp.github.com/left-or-right) to play.
 
 Screenshot
 ------------

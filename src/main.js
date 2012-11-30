@@ -39,10 +39,11 @@ var getMapDatas = function()
 {
   if (!svgDocs)
   {
-    var objects = nodelist2Array(document.getElementsByTagName("object"));
+    var objects = nodelist2Array(document.getElementsByTagName("svg"));
     svgDocs = objects.map(function(object)
                           {
-                            return object.contentDocument;
+                            //return object.contentDocument;
+                            return object;
                           });
 
     //remove all objects from page
@@ -83,6 +84,18 @@ var runNextLevel = function()
     return;
 
 
+  var leaveFun = levelTrans.leaveLevelTransGenerator(director, "left2right");
+  var enterFun = levelTrans.enterLevelTransGenerator(director, "left2right");
+  var transInfo = levelTrans.SetLevelSequenceTransition.create({ enterTrans:enterFun, leaveTime:1, enterTime:1000}); 
+  director.exec("setLevel", levels[curLevel], transInfo);
+};
+
+var runCurLevelAgain = function()
+{
+  var director = require("director").director();
+
+  levels[curLevel] = Level1.create({svgDoc:svgDocs[curLevel]});
+  
   var leaveFun = levelTrans.leaveLevelTransGenerator(director, "left2right");
   var enterFun = levelTrans.enterLevelTransGenerator(director, "left2right");
   var transInfo = levelTrans.SetLevelSequenceTransition.create({ enterTrans:enterFun, leaveTime:1, enterTime:1000}); 
@@ -167,5 +180,6 @@ function main()
 exports.main = main;
 exports.isLastLevel = isLastLevel;
 exports.runNextLevel = runNextLevel;
+exports.runCurLevelAgain = runCurLevelAgain;
 
 }};

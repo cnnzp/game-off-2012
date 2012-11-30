@@ -34,6 +34,59 @@ var getMapPaths = function(svgDoc)
    return ret;
 };
 
+/*
+d="m 244.6088,181.99712 c 25.20223,-12.21894 52.48967,-47.40738 81.23202,-38.79058     32.1616,9.64187 74.40063,46.50234 52.02501,86.25199 -22.37562,39.74965 -172.96033,0.45636 -172.96033,0.45636"
+*/
+var parsePath = function(svgPathEle)
+{
+  var d = svgPathEle.getAttribute("d").split(" ");
+  debug.assert(d[0] == "m", "cannot parse the svgpathelement");
+  
+  var bRelative = d[2] == "c";
+
+  var ret = [];
+
+  var lastEndPstn = d[1];
+
+  var index = 3;
+  while (1)
+  {
+    ret.push(lastEndPstn);  //start pstn
+    ret.push(d[index]); //control 1
+    ret.push(d[index + 1]); //control 2
+    ret.push(d[index + 2]); //end pstn
+
+    lastEndPstn = d[index + 2];
+    index += 3;
+
+    if ((index + 3) > d.length)
+      break;
+  }
+
+  ret = ret.map(function(pstn)
+                {
+                  var pstns = pstn.split(",").map(function(s)
+                                                  {
+                                                    return parseFloat(s);
+                                                  });
+
+                  return {x:pstns[0], y:pstns[1]};
+                });
+
+  if (bRelative)
+  {
+    var relativePstn = ret[0];
+
+    for (var i=1; i<ret.length; i++)
+    {
+      ret[i].x += relativePstn.x;
+      ret[i].y += relativePstn.y;
+    }
+  }
+
+  return ret;
+}
+
 var parsePath = function(svgPathEle)
 {
   var d = svgPathEle.getAttribute("d").split(" ");
@@ -795,8 +848,7 @@ var paintPaths = function(painter, pstns, strokeStyle)
   {
     ctx.arc(pstns[i].x, pstns[i].y, 3, Math.PI*2, 0);
   }
-  //ctx.fill();
- ctx.stroke();
+  ctx.fill();
 
   ctx.closePath();
   
