@@ -13,10 +13,12 @@ Make sure your browser support html5 canvas.
 
 Screenshot
 ------------
-Oh!Collision
+Oh! Collision! 
+
 ![Oh!Collision](http://github.com/cnnzp/game-off-2012/raw/master/screenshot/1.png)
 
-Yeah!Here we are!
+Yeah! Here we are! 
+
 ![Yeah!Here we are!](http://github.com/cnnzp/game-off-2012/raw/master/screenshot/2.png)
 
 Used open source projects:
