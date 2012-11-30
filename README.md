@@ -23,8 +23,8 @@ Yeah! Here we are!
 
 Used open source projects:
 ------------
-Colorbox: a html5 game engine which will be officially opened soon.
-Cocos2d-html: just geometry.js and distributing tool.
+*Colorbox: a html5 game engine which will be officially opened soon.
+*Cocos2d-html: just geometry.js and distributing tool.
 
 License:
 ------------
