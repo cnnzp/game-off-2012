@@ -102,7 +102,7 @@ var continueActorCtor = function(level, star, totalStar, continuation, again)
       break;
     case "mouseOver":
       if (evt.modelPath == "next" || evt.modelPath == "again")
-        canvas.style.cursor = "hand";
+        canvas.style.cursor = "pointer";
       break;
     case "mouseOut":
       if (evt.modelPath == "next" || evt.modelPath == "again")

@@ -103,7 +103,7 @@ var OpenLevel = Level.extend(
                    var painter = require("director").director().exec("defaultPainter");
                    var canvas = painter.exec("sketchpad").canvas;
 
-                   canvas.style.cursor = "hand";
+                   canvas.style.cursor = "pointer";
                  }).bind(s));
 
 
