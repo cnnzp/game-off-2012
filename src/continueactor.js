@@ -58,7 +58,6 @@ var continueActorCtor = function(level, star, totalStar, continuation, again)
   ,   starModel = m.rotateModel(StarModel.create({r:12, fill:"red"}), -Math.PI/9.6)
   ,   grayStarModel = m.rotateModel(StarModel.create({r:12, fill:"slategray"}), -Math.PI/9.6)
 
-  console.log("star:"+star+"totalStar:"+totalStar);
   for (var i = 0; i<totalStar; i++)
   {
     if (i < star)
