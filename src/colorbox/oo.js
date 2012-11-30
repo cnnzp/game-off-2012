@@ -5,6 +5,19 @@ var slice = Array.prototype.slice;
 
 var assert = require("debug").assert;
 
+var createObject = function(proto, properties)
+{
+  var newobj = Object.create(proto);
+  properties.forEach(function(val, key)
+                     {
+                       if (key == "__proto__")
+                         Object.defineProperty(newobj, key, {value:val, enumerable:false, writable:true});
+                       else
+                         newobj[key] = val;
+                     });
+
+  return newobj;
+};
 //----------------------------------
 var TraitFuncs = {
   isTrait : function ()
@@ -18,7 +31,7 @@ function checkTrait(t)
   assert(t.isTrait(), 
          "argument is not an valid trait!!! ");
 }
-
+/*
 var Trait = {
   _methods : {},
   _usedTraits : {},
@@ -27,17 +40,29 @@ var Trait = {
 
   __proto__ : TraitFuncs
 };
+*/
+
+var Trait = createObject(
+  TraitFuncs, 
+  {
+    _methods : {},
+    _usedTraits : {},
+    
+    forbidden : {_ownerTrait: Trait},
+    
+    __proto__ : TraitFuncs
+  });
 
 function compose(traits)
 {
   var methods = {};
   var usedTraits = {};
-  var nt = {
+  
+  var nt = createObject(TraitFuncs, {
     _methods: methods,
     _usedTraits: usedTraits,
-  };
-
-  nt.__proto__ = TraitFuncs;
+    __proto__: TraitFuncs
+  });
 
   for (var i = 0; i < traits.length; ++i)
   {
@@ -66,15 +91,15 @@ function extend (base, extendMethods)
 {
   checkTrait(base);
 
-  var methods = {};
+  var methods = createObject(base._methods, {__proto__:base._methods});
   var usedTraits = {};
-  var nt = {
-    _methods: methods,
-    _usedTraits: usedTraits,
-  };
 
-  nt.__proto__ = TraitFuncs;
-  methods.__proto__ = base._methods;
+  var nt = createObject(TraitFuncs,
+                        {
+                          _methods: methods,
+                          _usedTraits: usedTraits,
+                          __proto__: TraitFuncs
+                        });
 
   usedTraits[base.identifier] = base;
 
@@ -104,12 +129,13 @@ function neg(trait)
 
   var methods = {};
   var usedTraits = {};
-  var nt = {
-    _methods: methods,
-    _usedTraits: usedTraits,
-  };
+  var nt = createObject(TraitFuncs, 
+                        {
+                          _methods: methods,
+                          _usedTraits: usedTraits,
+                          __proto__: TraitFuncs
+                        });
 
-  nt.__proto__ = TraitFuncs;
   usedTraits[trait.identifier] = trait;
 
   var mtbl = trait._methods;
@@ -129,12 +155,13 @@ function rename(trait, nameMap)
 
   var methods = {};
   var usedTraits = {};
-  var nt = {
+  
+  var nt = createObject(TraitFuncs, {
     _methods: methods,
     _usedTraits: usedTraits,
-  };
+    __proto__: TraitFuncs
+  });
 
-  nt.__proto__ = TraitFuncs;
   usedTraits[trait.identifier] = trait;
 
   var mtbl = trait._methods;
@@ -163,12 +190,13 @@ function exclude(trait, nameList)
 
   var methods = {};
   var usedTraits = {};
-  var nt = {
+
+  var nt = createObject(TraitFuncs, {
     _methods: methods,
     _usedTraits: usedTraits,
-  };
+    __proto__: TraitFuncs
+  });
 
-  nt.__proto__ = TraitFuncs;
   usedTraits[trait.identifier] = trait;
 
   var mtbl = trait._methods;
@@ -191,12 +219,13 @@ function alias(trait, nameMap)
 
   var methods = {};
   var usedTraits = {};
-  var nt = {
+
+  var nt = createObject(TraitFuncs, {
     _methods: methods,
     _usedTraits: usedTraits,
-  };
+    __proto__: TraitFuncs
+  });
 
-  nt.__proto__ = TraitFuncs;
   usedTraits[trait.identifier] = trait;
 
   var mtbl = trait._methods;
@@ -228,12 +257,13 @@ function prefix(trait, prefixStr)
 
   var methods = {};
   var usedTraits = {};
-  var nt = {
+
+  var nt = createObject(TraitFuncs, {
     _methods: methods,
     _usedTraits: usedTraits,
-  };
+    __proto__: TraitFuncs
+  });
 
-  nt.__proto__ = TraitFuncs;
   usedTraits[trait.identifier] = trait;
 
   var mtbl = trait._methods;
@@ -292,11 +322,13 @@ function validMethod(m)
   return ((m !== undefined) && (m !== Trait.forbidden));
 }
 
-function useTraits(o, traits, extendMethods)
+function useTraits(o, protomethods, traits, extendMethods)
 {
   var innerTrait = extend(compose(traits),
                           extendMethods);
-  var newMtbl = {};
+
+  var newMtbl = createObject(protomethods, {__proto__: protomethods});
+  
   var traitMethods = innerTrait._methods;
   for (var mname in traitMethods)
   {
@@ -360,18 +392,18 @@ function clone(p, traits, extendMethods, custom)
 {
   assert(p.isEntity(), "1st argument expect an Entity!");
 
-  var shareStore = {};
+  var shareStore = createObject(p._shareStore, {__proto__:p._shareStore});
   var usedTraits = {};
 
-  var o = {
-    _shareStore : shareStore,
-    _usedTraits : usedTraits,
-  };
+  var o = createObject(p, 
+                       {
+                         _shareStore : shareStore,
+                         _usedTraits : usedTraits,
+                         __proto__: p
+                       });
 
-  o.__proto__ = p;
-  o._shareStore.__proto__ = p._shareStore;
-  useTraits(o, traits, extendMethods);
-  o._methods.__proto__ = p._methods;
+  useTraits(o, p._methods, traits, extendMethods);
+  //o._methods.__proto__ = p._methods;
 
   if (custom)
   {

@@ -11,6 +11,8 @@ Click [here](http://cnnzp.github.com/left-or-right) to play.
 Or clone https://github.com/cnnzp/game-off-2012.git and open index.html to play.
 Make sure your browser support html5 canvas. 
 
+We recommend high version chrome and safari. IE is not supported.
+
 Screenshot
 ------------
 Oh! Collision! 

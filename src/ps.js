@@ -1023,7 +1023,7 @@ var createPs = function(svgDoc)
    var svgPathEles = getMapPaths(svgDoc);
    
    //每张网页的Element等对象都不同的，所以这里必须初始化的svg所在的window的SVGPathElement
-   initSVGPathElement(svgPathEles[0].__proto__);
+   initSVGPathElement(svgPathEles[0].constructor.prototype);
    
    svgPathEles = svgPathEles.map(function(spe){spe.initPathData(); return spe;});
 
